@@ -7,8 +7,20 @@ app.post('/chat', async (req, res) => {
     const { speakerTitle, message } = req.body;
     
     try {
+        // 1. Fetch the exact active models available for your API key
+        const modelsResponse = await axios.get('https://api.groq.com/openai/v1/models', {
+            headers: { 'Authorization': `Bearer ${process.env.GROQ_API_KEY}` }
+        });
+        
+        // Find a Llama model, or default to the first available model in your account
+        const availableModels = modelsResponse.data.data.map(m => m.id);
+        const selectedModel = availableModels.find(m => m.includes('llama')) || availableModels[0];
+        
+        console.log(`Using Groq model: ${selectedModel}`);
+
+        // 2. Call the chat completion endpoint with the verified model
         const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
-            model: "llama-3.1-8b-instant",
+            model: selectedModel,
             messages: [
                 {
                     role: "system",
