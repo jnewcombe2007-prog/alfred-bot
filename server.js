@@ -22,6 +22,7 @@ app.post('/chat', async (req, res) => {
 
         res.json({ reply: response.data.choices[0].message.content });
     } catch (error) {
+        console.error("Groq Error:", error.response ? error.response.data : error.message);
         res.json({ reply: "My apologies, sir, but my train of thought was interrupted." });
     }
 });
